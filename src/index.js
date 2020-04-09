@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import axios from "axios";
+import TodoItem from "./todo-item"
+
 class App extends React.Component {
   constructor() {
     super();
@@ -9,6 +12,14 @@ class App extends React.Component {
       todo: "",
       todos: [],
     };
+  }
+
+  renderToDos = () => {
+    return this.state.todos.map(item => {
+      return (
+        <TodoItem key = {item.id} item={item}/>
+      )
+    })
   }
 
   addTodo = (e) => {
@@ -22,11 +33,23 @@ class App extends React.Component {
     });
   };
 
+  componentDidMount() {
+    axios.get("https://dkd-flask-todo-api.herokuapp.com/todos")
+    .then(res=> {
+      this.setState({
+        todos: res.data,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
   render() {
     return (
-      <div>
+      <div className="app">
         <h1>ToDo List</h1>
-        <form className="add-todo" onSubmit={addTodo}>
+        <form className="add-todo" onSubmit={this.addTodo}>
           <input
             type="text"
             placeholder="Add To"
@@ -34,7 +57,9 @@ class App extends React.Component {
             onChange={(e) => this.handleChange(e)}
             value={this.state.todo}
           />
+        <button type="submit">Add</button>
         </form>
+        {this.renderToDos()}
       </div>
     );
   }
