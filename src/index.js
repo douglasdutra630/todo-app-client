@@ -14,6 +14,19 @@ class App extends React.Component {
     };
   }
 
+  deleteItem = id => {
+    fetch(`https://ejt-flask-todo-api.herokuapp.com/todo/${id}`, {
+      method: "DELETE"
+    })
+    .then(
+      this.setState({
+        todos: this.state.todos.filter(item => {
+          return item.id !== id;
+        })
+      })
+    )
+  }
+
   renderToDos = () => {
     return this.state.todos.map(item => {
       return (
@@ -23,8 +36,19 @@ class App extends React.Component {
   }
 
   addTodo = (e) => {
-    e.preventDefault()
-    console.log("added todo");
+    e.preventDefault();
+    axios
+      .post("https://dkd-flask-todo-api.herokuapp.com/todo", {
+        title: this.state.todo,
+        done: false,
+      })
+      .then((res) => {
+        this.setState({
+          todos: [res.data, ...this.state.todos],
+          todo: "",
+        });
+      })
+      .catch((err) => console.log("Add todo Error: ", err));
   };
 
   handleChange = (e) => {
